@@ -18,7 +18,6 @@ export BASH_ENV
 cd /go/src/github.com/stackrox
 git clone https://github.com/stackrox/stackrox.git
 cd stackrox
-git submodule update --init
 
 # Checkout the PR branch
 head_ref=$(get_pr_details | jq -r '.head.ref')
