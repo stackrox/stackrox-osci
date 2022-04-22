@@ -36,4 +36,3 @@ echo "3.69.x-310-g23ca4e5107" > CI_TAG
 .openshift-ci/dispatch.sh "$*"
 
 info "nothing to see here either"
-
