@@ -19,10 +19,12 @@ cd /go/src/github.com/stackrox
 git clone https://github.com/stackrox/stackrox.git
 cd stackrox
 
-# Checkout the PR branch
+# Checkout the PR branch if it is a PR
 head_ref=$(get_pr_details | jq -r '.head.ref')
-info "Will try to checkout a matching PR branch using: $head_ref"
-git checkout "$head_ref"
+if [[ "$head_ref" != "null" ]]; then
+    info "Will try to checkout a matching PR branch using: $head_ref"
+    git checkout "$head_ref"
+fi
 
 # make deps as a tire kick
 make deps
