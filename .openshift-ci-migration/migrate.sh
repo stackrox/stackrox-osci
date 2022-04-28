@@ -29,4 +29,4 @@ fi
 # Handoff to target repo dispatch
 .openshift-ci/dispatch.sh "$*"
 
-info "nothing to see here either"
+info "nothing to see in stackrox-osci either"
