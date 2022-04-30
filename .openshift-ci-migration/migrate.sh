@@ -27,6 +27,6 @@ if [[ "$head_ref" != "null" ]]; then
 fi
 
 # Handoff to target repo dispatch
-.openshift-ci/dispatch.sh "$*"
+.openshift-ci/dispatch.sh "$@"
 
 info "nothing to see in stackrox-osci either"
