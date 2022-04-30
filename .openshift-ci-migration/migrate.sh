@@ -26,14 +26,7 @@ if [[ "$head_ref" != "null" ]]; then
     git checkout "$head_ref"
 fi
 
-# make deps as a tire kick
-make deps
-
-# there is no build in OSCI yet, so hard code a known good one for migration
-echo "3.69.x-310-g23ca4e5107" > CI_TAG
-
 # Handoff to target repo dispatch
-.openshift-ci/dispatch.sh "$*"
+.openshift-ci/dispatch.sh "$@"
 
-info "nothing to see here either"
-
+info "nothing to see in stackrox-osci either"
