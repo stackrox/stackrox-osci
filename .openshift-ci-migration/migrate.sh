@@ -15,7 +15,7 @@ BASH_ENV=$(mktemp)
 export BASH_ENV
 
 info "Git history:"
-git log --oneline --decorate | head
+(git log --oneline --decorate | head) || true
 
 # Clone the target repo
 cd /go/src/github.com/stackrox
