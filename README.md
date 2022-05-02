@@ -5,3 +5,4 @@ stackrox/stackrox.
 
 OpenShift CI: https://github.com/openshift/release
 Configuration for StackRox: https://github.com/openshift/release/tree/master/ci-operator/config/stackrox
+
