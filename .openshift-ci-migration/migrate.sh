@@ -3,6 +3,16 @@
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 source "$ROOT/.openshift-ci-migration/lib.sh"
 
+info "ENV DUMP:"
+env | sort
+info "END ENV DUMP:"
+
+info "Git history:"
+(git log --oneline --decorate | head) || true
+
+info "PR Details"
+(get_pr_details | jq) || true
+
 set -euo pipefail
 
 shopt -s nullglob
@@ -13,9 +23,6 @@ done
 # For cci-export, override BASH_ENV from stackrox-test with something that is writable.
 BASH_ENV=$(mktemp)
 export BASH_ENV
-
-info "Git history:"
-(git log --oneline --decorate | head) || true
 
 # Clone the target repo
 cd /go/src/github.com/stackrox
