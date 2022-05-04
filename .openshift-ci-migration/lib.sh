@@ -140,9 +140,14 @@ gate_pr_jobs() {
 
     if [[ -n "${run_with_changed_path}" || -n "${changed_path_to_ignore}" ]]; then
         local diff_base
-        diff_base="$(git merge-base HEAD origin/master)"
-        echo "Determined diff-base as ${diff_base}"
-        echo "Master SHA: $(git rev-parse origin/master)"
+        if is_CIRCLECI; then
+            diff_base="$(git merge-base HEAD origin/master)"
+            echo "Determined diff-base as ${diff_base}"
+            echo "Master SHA: $(git rev-parse origin/master)"
+        elif is_OPENSHIFT_CI; then
+            diff_base="$(jq -r '.refs[0].base_sha' <<<"$CLONEREFS_OPTIONS")"
+            echo "Determined diff-base as ${diff_base}"
+        fi
         echo "Diffbase diff:"
         { git diff --name-only "${diff_base}" | cat ; } || true
         ignored_regex="${changed_path_to_ignore}"
