@@ -3,6 +3,16 @@
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 source "$ROOT/.openshift-ci-migration/lib.sh"
 
+info "ENV DUMP:"
+env | sort
+info "END ENV DUMP:"
+
+info "Git history:"
+(git log --oneline --decorate | head) || true
+
+info "PR Details"
+(get_pr_details | jq) || true
+
 set -euo pipefail
 
 openshift_ci_mods
