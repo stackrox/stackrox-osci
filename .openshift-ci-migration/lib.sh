@@ -99,7 +99,7 @@ gate_jobs() {
     if [[ "$(jq .id <<<"$pr_details")" != "null" ]]; then
         gate_pr_jobs "$pr_details"
     else
-        die "next"
+        gate_merge_jobs
     fi
 }
 
@@ -115,8 +115,7 @@ gate_pr_jobs() {
         gke-upgrade-tests)
             run_with_labels=("ci-upgrade-tests")
             skip_with_label="ci-no-upgrade-tests"
-            run_with_changed_path='^paths/(a|c)'
-            changed_path_to_ignore='^.openshift-ci-migration/|^README|^paths'
+            run_with_changed_path='^migrator/.*$|^image/'
             ;;
         *)
             info "There is no gating criteria for $job"
@@ -159,6 +158,37 @@ gate_pr_jobs() {
         fi
     fi
 
-    info "$job will not run"
+    info "$job will be skipped"
+    exit 0
+}
+
+gate_merge_jobs() {
+    local run_on_master=""
+    local run_on_tags=""
+
+    case "$job" in
+        gke-upgrade-tests)
+            run_on_master="true"
+            run_on_tags="true"
+            ;;
+        *)
+            info "There is no gating criteria for $job"
+            return
+    esac
+
+    local base_ref
+    base_ref="$(jq -r '.refs[0].base_ref' <<<"$CLONEREFS_OPTIONS")"
+
+    if [[ "${base_ref}" == "master" && "${run_on_master}" == "true" ]]; then
+        info "$job will run because this is master and run_on_master==true"
+        return
+    fi
+
+    if [[ -n "$(git tag --contains)" && "${run_on_tags}" == "true" ]]; then
+        info "$job will run because the head of this branch is tagged and run_on_tags==true"
+        return
+    fi
+
+    info "$job will be skipped"
     exit 0
 }
