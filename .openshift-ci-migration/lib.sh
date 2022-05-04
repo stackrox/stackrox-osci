@@ -117,6 +117,7 @@ gate_pr_jobs() {
             skip_with_label="ci-no-upgrade-tests"
             run_with_changed_path='^migrator/.*$|^image/'
             changed_path_to_ignore='^ui/'
+            sleep 3600
             ;;
         *)
             info "There is no gating criteria for $job"
