@@ -115,8 +115,8 @@ gate_pr_jobs() {
         gke-upgrade-tests)
             run_with_labels=("ci-upgrade-tests")
             skip_with_label="ci-no-upgrade-tests"
-            run_with_changed_path='^migrator/.*$|^image/'
-            changed_path_to_ignore='^ui/'
+            run_with_changed_path='^paths/(a|c)'
+            changed_path_to_ignore='^paths/b'
             ;;
         *)
             info "There is no gating criteria for $job"
