@@ -96,7 +96,7 @@ gate_jobs() {
     local pr_details
     pr_details="$(get_pr_details)"
 
-    if [[ "$(jq .id <<<"$pr_details")" == "null" ]]; then
+    if [[ "$(jq .id <<<"$pr_details")" != "null" ]]; then
         gate_pr_jobs "$pr_details"
     else
         die "next"
@@ -107,16 +107,28 @@ gate_pr_jobs() {
     local pr_details="$1"
 
     local run_with_labels=()
-    local skip_with_label=()
+    local skip_with_label=""
+    local run_with_changed_path=""
+    local changed_path_to_ignore=""
 
     case "$job" in
         gke-upgrade-tests)
             run_with_labels=("ci-upgrade-tests")
-            skip_with_label=("ci-no-upgrade-tests")
+            skip_with_label="ci-no-upgrade-tests"
+            run_with_changed_path='^migrator/.*$|^image/'
+            changed_path_to_ignore='^ui/'
             ;;
         *)
-            info "There are no gating labels for $job"
+            info "There is no gating criteria for $job"
+            return
     esac
+
+    if [[ -n "$skip_with_label" ]]; then
+        if pr_has_label "${skip_with_label}" "${pr_details}"; then
+            info "$job will not run because the PR has label $skip_with_label"
+            exit 0
+        fi
+    fi
 
     for run_with_label in "${run_with_labels[@]}"; do
         if pr_has_label "${run_with_label}" "${pr_details}"; then
@@ -125,6 +137,23 @@ gate_pr_jobs() {
         fi
     done
 
-    info "This job will not run"
+    if [[ -n "${run_with_changed_path}" || -n "${changed_path_to_ignore}" ]]; then
+        local diff_base
+        diff_base="$(git merge-base HEAD origin/master)"
+        echo "Determined diff-base as ${diff_base}"
+        echo "Master SHA: $(git rev-parse origin/master)"
+        echo "Diffbase diff:"
+        { git diff --name-only "${diff_base}" | cat ; } || true
+        ignored_regex="${changed_path_to_ignore}"
+        [[ -n "$ignored_regex" ]] || ignored_regex='$^' # regex that matches nothing
+        match_regex="${run_with_changed_path}"
+        [[ -n "$match_regex" ]] || match_regex='^.*$' # grep -E -q '' returns 0 even on empty input, so we have to specify some pattern
+        if grep -E -q "$match_regex" < <({ git diff --name-only "${diff_base}" || echo "???" ; } | grep -E -v "$ignored_regex"); then
+            info "$job will run because paths matching $match_regex (and not matching ${ignored_regex}) had changed."
+            return
+        fi
+    fi
+
+    info "$job will not run"
     exit 0
 }
