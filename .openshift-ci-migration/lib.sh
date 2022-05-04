@@ -116,7 +116,7 @@ gate_pr_jobs() {
             run_with_labels=("ci-upgrade-tests")
             skip_with_label="ci-no-upgrade-tests"
             run_with_changed_path='^paths/(a|c)'
-            changed_path_to_ignore='^paths/b'
+            changed_path_to_ignore='^.openshift-ci-migration/|^README|^paths'
             ;;
         *)
             info "There is no gating criteria for $job"
