@@ -1,3 +1,3 @@
-FROM registry.access.redhat.com/ubi8/ubi:latest
+FROM quay.io/centos/centos:stream8
 
-RUN yum -y update
+RUN dnf -y update
