@@ -1,3 +1,3 @@
 FROM quay.io/centos/centos:stream8
 
-RUN dnf -y update
+RUN echo "I am an image!" >> /hello_world.txt
